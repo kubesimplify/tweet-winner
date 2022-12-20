@@ -4,6 +4,8 @@ In order to run this project on your own, you can just apply the deploy.yaml on 
 
 You can get the bearer token form [Twitter Developers](https://developer.twitter.com/).
 
+<img width="637" alt="Screenshot 2022-12-20 at 9 40 41 AM" src="https://user-images.githubusercontent.com/8190114/208583643-6e3ea85e-c8f2-4896-baa5-e9a073924944.png">
+
 Create secrets using below command 
 
 '''
