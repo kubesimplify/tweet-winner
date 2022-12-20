@@ -1,0 +1,106 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: twitter-winner
+  namespace: demo
+spec:
+  selector:
+    matchLabels:
+      app: twitter
+  template:
+    metadata:
+      labels:
+        app: twitter
+    spec:
+      terminationGracePeriodSeconds: 5
+      containers:
+      - name: server
+        image: saiyam911/twitter-winner
+        env:
+          - name: API_KEY
+            valueFrom:
+              secretKeyRef:
+                name: apikey
+                key: value
+          - name: PORT
+            value: "8080"
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: twitter-winner
+  namespace: demo
+spec:
+  selector:
+    app: twitter
+  ports:
+  - name: http
+    port: 80
+    protocol: TCP
+    targetPort: 8080
+  type: NodePort
+  
+---
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: twitter-demo
+  namespace: demo
+spec:
+  acme:
+    # The ACME server URL
+    server: https://acme-v02.api.letsencrypt.org/directory
+    # Email address used for ACME registration
+    email: saiym911@gmail.com
+    # Name of a secret used to store the ACME account private key
+    privateKeySecretRef:
+      name: letsencrypt-prod
+    # Enable the HTTP-01 challenge provider
+    solvers:
+    - http01:
+        ingress:
+          class: traefik
+          
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: twitter-winner
+  namespace: demo
+spec:
+  secretName: demo
+  issuerRef:
+    name: letsencrypt-prod
+    kind: ClusterIssuer
+  commonName: twitter-winner.e65f444e-e201-40bd-b0f4-7a18c3601d00.k8s.civo.com
+  dnsNames:
+  - twitter-winner.e65f444e-e201-40bd-b0f4-7a18c3601d00.k8s.civo.com
+  
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    kubernetes.io/ingress.class: traefik
+  name: twitter-app-ingress
+  namespace: demo
+spec:
+  rules:
+  - host: twitter-winner.e65f444e-e201-40bd-b0f4-7a18c3601d00.k8s.civo.com
+    http:
+      paths:
+      - backend:
+          service:
+            name: twitter-winner
+            port:
+              number: 80
+        path: /
+        pathType: Prefix
+  tls:
+  - hosts:
+    - twitter-winner.e65f444e-e201-40bd-b0f4-7a18c3601d00.k8s.civo.com
+    secretName: demo

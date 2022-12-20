@@ -1,1 +1,22 @@
 # tweet-winner
+
+In order to run this project on your own, you can just apply the deploy.yaml on your Kubernetes clsuter. You would need to create a secret before applying this with the bearer token. This will deploy all the components in demo namespace. 
+
+You can get the bearer token form [Twitter Developers](https://developer.twitter.com/).
+
+Create secrets using below command 
+
+'''
+kubectl create secret -n demo generic apikey --from-literal=value="Bearer_token"
+'''
+
+Make sure you have an ingress controller installed in order to access the ingress created, in this case Traefik ingress controller is used.If not, you can change the service to Loadbalancer or access it via nodeport.
+
+
+For Developement:
+
+All the code and files are also in the repo, so if you want to customize the html, Dockerfile or code, you can do that. Though contributions to improve are welcome.
+
+Note - the error handling is currenlty not there, so that is something that can be contirbuted first.
+
+
