@@ -8,9 +8,9 @@ You can get the bearer token form [Twitter Developers](https://developer.twitter
 
 Create secrets using below command 
 
-'''
+```
 kubectl create secret -n demo generic apikey --from-literal=value="Bearer_token"
-'''
+```
 
 Make sure you have an ingress controller installed in order to access the ingress created, in this case Traefik ingress controller is used.If not, you can change the service to Loadbalancer or access it via nodeport.
 
